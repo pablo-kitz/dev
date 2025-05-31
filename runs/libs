@@ -6,4 +6,5 @@ sudo apt -y install \
   jq \
   stow \
   curl \
-  ffmpeg
+  ffmpeg \
+  fzf

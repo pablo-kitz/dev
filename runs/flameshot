@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+sudo apt -y update
+sudo apt -y install flameshot
+
+
+# Unbind the default Print Screen action
+gsettings set org.gnome.shell.keybindings show-screenshot-ui "[]"
+
+# Add new custom shortcut path to the list
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings \
+"['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+
+# Set the name
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'Flameshot GUI'
+
+# Set the command
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'script --command "flameshot gui" /dev/null'
+
+# Set the key binding (Print Screen key)
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding 'Print'
+
