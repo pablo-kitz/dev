@@ -1,1 +1,5 @@
-# dev
+# dev setup
+
+```bash
+  ./run
+```
