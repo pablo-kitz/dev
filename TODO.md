@@ -1,0 +1,4 @@
+- [ ] Setup GNU Stow
+ - [ ] Git
+ - [ ] Zsh
+ - [ ] Neovim
