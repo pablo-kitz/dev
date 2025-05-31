@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+runs_dir=`find $script_dir/runs -mindepth 1 -maxdepth 1 -executable`
+
+DRY_RUN=false
+FAILED_SCRIPTS=()
+SUCCESS_COUNT=0
+TOTAL_COUNT=0
+
+while [[ $# -gt 0 ]]; do
+    echo "ARG: \"$1\""
+    if [[ "$1" == "--dry" ]]; then
+        DRY_RUN=true
+    fi
+    shift
+done
+
+log() {
+    local timestamp=$(date '+%H:%M:%S')
+    if $DRY_RUN; then
+        echo "[$timestamp] [DRY_RUN]: $1"
+    else
+        echo "[$timestamp] $1"
+    fi
+}
+
+log_error() {
+    local timestamp=$(date '+%H:%M:%S')
+    echo "[$timestamp] [ERROR]: $1" >&2
+}
+
+for s in $runs_dir; do
+    TOTAL_COUNT=$((TOTAL_COUNT + 1))
+    script_name=$(basename "$s")
+    
+    log "Running: $s"
+
+    if ! $DRY_RUN; then
+        # Run the script and capture its exit code
+        if "$s"; then
+            log "✓ SUCCESS: $script_name completed successfully"
+            SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+        else
+            exit_code=$?
+            log_error "✗ FAILED: $script_name exited with code $exit_code"
+            FAILED_SCRIPTS+=("$script_name (exit code: $exit_code)")
+        fi
+    else
+        SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
+    fi
+done
+
+# Final summary
+echo ""
+log "=== EXECUTION SUMMARY ==="
+log "Total scripts: $TOTAL_COUNT"
+log "Successful: $SUCCESS_COUNT"
+log "Failed: $((TOTAL_COUNT - SUCCESS_COUNT))"
+
+if [ ${#FAILED_SCRIPTS[@]} -gt 0 ]; then
+    echo ""
+    log_error "Failed scripts:"
+    for failed in "${FAILED_SCRIPTS[@]}"; do
+        log_error "  - $failed"
+    done
+    echo ""
+    log_error "Some scripts failed, but execution continued for all scripts."
+    exit 1
+else
+    echo ""
+    log "All scripts completed successfully!"
+    exit 0
+fi

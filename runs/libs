@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+sudo apt -y update
+sudo apt -y install \
+  git \
+  jq \
+  stow \
+  curl \
+  ffmpeg

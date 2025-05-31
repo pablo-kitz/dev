@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+sudo apt install flameshot
+
+sudo snap install --classic code
+sudo snap install bitwarden postman
