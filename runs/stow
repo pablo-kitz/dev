@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+sudo apt -y update
+sudo apt -y install stow
+
+stow --adopt dotfiles
+git restore dotfiles/
