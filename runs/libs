@@ -9,4 +9,12 @@ sudo apt -y install \
   ffmpeg \
   fzf \
   tree \
-  htop
+  htop \
+  fd-find \
+  ripgrep \
+  bat \
+  nvim
+
+export PATH="$HOME/.local/bin:$PATH"
+mkdir -p $HOME/.local/bin/fd
+ln -s $(which fdfind) $HOME/.local/bin/fd

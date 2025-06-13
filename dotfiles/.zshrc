@@ -8,7 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="random"
+ZSH_THEME="almamater"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -70,7 +70,11 @@ ZSH_THEME="random"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git fzf npm)
+
+export FZF_BASE='/usr/bin/fzf'
+
+export FZF_DEFAULT_COMMAND='fzf'
 
 source $ZSH/oh-my-zsh.sh
 
@@ -102,3 +106,29 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+
+# fzf key bindings and fuzzy completion
+[[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+# [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
+
+alias zource='source ~/.zshrc'
+
+gcof() {
+  local branch
+  branch=$(git branch -a | sed 's#remotes/origin/##' | sort -u | fzf --prompt="Checkout or create branch: ") || return 1
+
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    # Branch exists locally, just checkout
+    git checkout "$branch"
+  elif git show-ref --verify --quiet "refs/remotes/$branch"; then
+    # Branch exists remotely only, checkout tracking branch
+    git checkout -t "$branch"
+  else
+    # Branch does not exist, create it
+    git checkout -b "$branch"
+  fi
+}

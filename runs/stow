@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# this is stow installation and initialization script
+# for updating dotfiles use `stow` in the root of the repository
+
 sudo apt -y update
 sudo apt -y install stow
 

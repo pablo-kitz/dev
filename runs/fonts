@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+fonts_dir="$HOME/.local/share/fonts"
+mkdir -p $fonts_dir
+
+# Jetbrains Mono
+mkdir -p $fonts_dir/JetBrainsMono-NF
+wget -P $fonts_dir/JetBrainsMono-NF https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+unzip $fonts_dir/JetBrainsMono-NF/JetBrainsMono.zip -d $fonts_dir/JetBrainsMono-NF
+rm $fonts_dir/JetBrainsMono-NF/JetBrainsMono.zip
+
+fc-cache -f -v
+
+PROFILE_ID=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d \')
+
+gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE_ID/" use-system-font false
+gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE_ID/" font 'JetBrains Mono Nerd Font 12'
