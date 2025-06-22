@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+curl -LO https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.appimage
+mv nvim-linux-x86_64.appimage nvim
+chmod u+x nvim
+mv nvim /usr/local/bin/
