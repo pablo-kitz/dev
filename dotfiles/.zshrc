@@ -107,7 +107,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/go/bin:$PATH"
 
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
@@ -115,20 +115,30 @@ export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]] && source /usr/share/doc/fzf/examples/key-bindings.zsh
 # [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
 
-alias zource='source ~/.zshrc'
+export FZF_ALT_C_OPTS="--walker-skip .git,node_modules,target"
+
+alias zource='source ~/.zshrc && [ -n "$TMUX" ] && tmux list-sessions >/dev/null 2>&1 && tmux source ~/.tmux.conf'
 
 gcof() {
-  local branch
-  branch=$(git branch -a | sed 's#remotes/origin/##' | sort -u | fzf --prompt="Checkout or create branch: ") || return 1
+  local branch full_branch
+
+  full_branch=$(git branch -a | sed 's/^..//' | sort -u | fzf --prompt="Checkout or create branch: ") || return 1
+
+  # Extract the actual branch name (without remote prefix if any)
+  branch="${full_branch#remotes/origin/}"
+  branch="${branch#remotes/}"
 
   if git show-ref --verify --quiet "refs/heads/$branch"; then
-    # Branch exists locally, just checkout
+    # Branch exists locally
     git checkout "$branch"
-  elif git show-ref --verify --quiet "refs/remotes/$branch"; then
-    # Branch exists remotely only, checkout tracking branch
-    git checkout -t "$branch"
+  elif [[ "$full_branch" == remotes/* ]]; then
+    # Remote branch: track it
+    git checkout -t "$full_branch"
   else
-    # Branch does not exist, create it
+    # Doesn't exist, create it
     git checkout -b "$branch"
   fi
 }
+# opencode
+export PATH=/home/pablokitz/.opencode/bin:$PATH
+

@@ -11,3 +11,8 @@
 	helper = manager
 	credentialStore = secretservice
 	useHttpPath = true
+[init]
+	defaultBranch = main
+	templateDir = ~/.git-templates
+[push]
+	autoSetupRemote = true

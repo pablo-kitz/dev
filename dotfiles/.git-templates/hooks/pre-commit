@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Get staged JS/TS files
+files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|ts|jsx|tsx)$')
+
+found=0
+output=""
+decline=0
+
+declare -A file_confirmed
+
+for file in $files; do
+  result=$(git diff --cached -U0 -- "$file" |
+    grep -E '^@@ .*\+([0-9]+),?([0-9]*) @@' -A9999 |
+    awk -v file="$file" '
+      /^@@ .*\+([0-9]+),?([0-9]*) @@/ {
+        split($0, a, "+")
+        split(a[2], b, /[ ,@]/)
+        lineno = b[1] - 1
+        next
+      }
+      /^\+/ {
+        lineno++
+        if ($0 ~ /console\.log|debugger/) {
+          print file ":" lineno ": " $0
+        }
+      }
+    ')
+  
+  if [ -n "$result" ]; then
+    found=1
+    output="$output$result"$'\n'
+    echo "$result"
+    while true; do
+      read -p "⚠️  Debug statements found in $file. Continue with commit? [y/N]: " yn
+      case $yn in
+        [Yy]*) file_confirmed[$file]=1; break;;
+        [Nn]*|"") decline=1; file_confirmed[$file]=0; break;;
+        *) echo "Please answer yes or no.";;
+      esac
+    done
+  fi
+
+done
+
+if [ "$found" -eq 1 ]; then
+  if [ "$decline" -eq 1 ]; then
+    echo "❌ Commit blocked: Debug statements found and not confirmed."
+    exit 1
+  fi
+fi
