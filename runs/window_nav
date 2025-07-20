@@ -1,0 +1,34 @@
+#!/bin/bash
+# window_nav: GNOME workspace and app navigation setup
+# Installs JustPerfectionGnome, disables animations, sets workspace hotkeys, and binds Alt+1/2/3 to Chrome/Alacritty/VSCode on workspaces 1/2/3
+
+set -e
+
+# 1. Install dependencies
+sudo apt update
+sudo apt install -y gnome-shell-extension-manager pipx wmctrl
+pipx install gnome-extensions-cli --system-site-packages
+
+# 2. Install JustPerfectionGnome extension only
+gext install just-perfection-desktop@just-perfection
+sudo cp ~/.local/share/gnome-shell/extensions/just-perfection-desktop@just-perfection/schemas/org.gnome.shell.extensions.just-perfection.gschema.xml /usr/share/glib-2.0/schemas/
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+gnome-extensions enable just-perfection-desktop@just-perfection
+
+gsettings set org.gnome.shell.extensions.just-perfection workspace-popup false
+
+# 3. Remove GNOME animations
+gsettings set org.gnome.shell.extensions.just-perfection animation 0
+# Optionally, also globally:
+gsettings set org.gnome.desktop.interface enable-animations false
+
+gsettings set org.gnome.mutter dynamic-workspaces false
+gsettings set org.gnome.desktop.wm.preferences num-workspaces 5
+
+# 4. Set Alt+1..5 to switch to workspaces 1..5
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-1 "['<Alt>1']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-2 "['<Alt>2']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-3 "['<Alt>3']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-4 "['<Alt>4']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-5 "['<Alt>5']"

@@ -142,3 +142,4 @@ gcof() {
 # opencode
 export PATH=/home/pablokitz/.opencode/bin:$PATH
 
+eval "$(zoxide init zsh --cmd cd)"
