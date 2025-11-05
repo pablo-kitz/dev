@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -e
+
+# Install Rust/cargo if missing
+if ! command -v cargo >/dev/null 2>&1; then
+  echo "Rust/cargo not found. Installing via rustup..."
+  curl https://sh.rustup.rs -sSf | sh -s -- -y
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
+# Install or update Alacritty
+if ! command -v alacritty >/dev/null 2>&1; then
+  echo "Installing Alacritty via cargo..."
+  cargo install alacritty
+else
+  echo "Updating Alacritty via cargo..."
+  cargo install alacritty --force
+fi
+
+# Download SVG icon
+ICON_DIR="$HOME/.local/share/icons"
+mkdir -p "$ICON_DIR"
+ICON_PATH="$ICON_DIR/alacritty-term.svg"
+wget -O "$ICON_PATH" https://raw.githubusercontent.com/alacritty/alacritty/master/extra/logo/alacritty-term.svg
+
+# Create desktop entry
+DESKTOP_DIR="$HOME/.local/share/applications"
+mkdir -p "$DESKTOP_DIR"
+cat >"$DESKTOP_DIR/alacritty.desktop" <<EOF
+[Desktop Entry]
+Name=Alacritty
+Comment=GPU-accelerated terminal emulator
+Exec=$HOME/.cargo/bin/alacritty
+Icon=$ICON_PATH
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;
+EOF
+
+# Make desktop entry executable
+chmod +x "$DESKTOP_DIR/alacritty.desktop"
+
+# Update desktop database
+update-desktop-database "$DESKTOP_DIR"
+
+# Set Alacritty as GNOME's default terminal (Ctrl+Alt+T)
+gsettings set org.gnome.desktop.default-applications.terminal exec "$HOME/.cargo/bin/alacritty"
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg ""
+
+# Fullscreen for vscode/chrome
+gsettings set org.gnome.desktop.wm.keybindings toggle-fullscreen "['<Shift>F11']"
+
+# Set Alacritty as system default terminal emulator (Debian/Ubuntu)
+sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$HOME/.cargo/bin/alacritty" 100
+sudo update-alternatives --set x-terminal-emulator "$HOME/.cargo/bin/alacritty"
+
+echo "Alacritty installation, GNOME integration, and default terminal setup complete!"

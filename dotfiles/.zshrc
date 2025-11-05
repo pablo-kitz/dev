@@ -139,7 +139,26 @@ gcof() {
     git checkout -b "$branch"
   fi
 }
+
+gsettings set org.gnome.desktop.wm.keybindings toggle-fullscreen "['<Shift>F11']"
+
 # opencode
 export PATH=/home/pablokitz/.opencode/bin:$PATH
 
 eval "$(zoxide init zsh --cmd cd)"
+
+# pnpm
+export PNPM_HOME="/home/pablokitz/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# bun completions
+[ -s "/home/pablokitz/.bun/_bun" ] && source "/home/pablokitz/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+export PATH="$HOME/.local/npm/bin:$PATH"
